@@ -42,6 +42,15 @@ function createDateValues(date: Date): DateFormatValues {
   }
 }
 
+export function formatDate(date: string | number | Date, format: string): string
+
+export function formatDate(
+  date: string | number | Date,
+  format: null | undefined
+): DateFormatValues
+
+export function formatDate(date: string | number | Date): string
+
 /**
  * Formatting Dates
  * @param date - The date to be formatted (can be a string, a numeric timestamp, or a Date object)
