@@ -93,6 +93,7 @@ describe('typed utilities', () => {
     it('should return true for strings', () => {
       expect(isString('hello')).toBe(true)
       expect(isString('')).toBe(true)
+      // eslint-disable-next-line unicorn/new-for-builtins
       expect(isString(new String('test'))).toBe(true)
     })
 

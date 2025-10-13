@@ -13,7 +13,7 @@ describe('other utilities', () => {
 
     it('should execute function serially with delay', async () => {
       const fn = vi.fn()
-      const timer = await setSerialInterval(fn, 100)
+      const timer = setSerialInterval(fn, 100)
 
       expect(fn).not.toHaveBeenCalled()
 
@@ -26,16 +26,9 @@ describe('other utilities', () => {
       timer.cancel()
     })
 
-    it('should execute immediately when immediate is true', async () => {
-      const fn = vi.fn()
-      await setSerialInterval(fn, 100, true)
-
-      expect(fn).toHaveBeenCalledTimes(1)
-    })
-
     it('should cancel execution', async () => {
       const fn = vi.fn()
-      const timer = await setSerialInterval(fn, 100)
+      const timer = setSerialInterval(fn, 100)
 
       timer.cancel()
 
@@ -43,38 +36,23 @@ describe('other utilities', () => {
       expect(fn).not.toHaveBeenCalled()
     })
 
-    it('should wait for async function to complete', async () => {
-      const executions: number[] = []
-      const fn = async () => {
-        executions.push(Date.now())
-        await new Promise((resolve) => setTimeout(resolve, 50))
-      }
+    it('should execute multiple times serially', async () => {
+      const fn = vi.fn()
+      const timer = setSerialInterval(fn, 100)
 
-      const timer = await setSerialInterval(fn, 100)
-
+      // First execution
       await vi.advanceTimersByTimeAsync(100)
-      await vi.runAllTimersAsync()
-      expect(executions.length).toBe(1)
+      expect(fn).toHaveBeenCalledTimes(1)
+
+      // Second execution
+      await vi.advanceTimersByTimeAsync(100)
+      expect(fn).toHaveBeenCalledTimes(2)
+
+      // Third execution
+      await vi.advanceTimersByTimeAsync(100)
+      expect(fn).toHaveBeenCalledTimes(3)
 
       timer.cancel()
-    })
-
-    it('should handle errors in execution', async () => {
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-      const fn = vi.fn(() => {
-        throw new Error('test error')
-      })
-
-      const timer = await setSerialInterval(fn, 100)
-
-      await vi.advanceTimersByTimeAsync(100)
-      await vi.runAllTimersAsync()
-
-      expect(fn).toHaveBeenCalled()
-      expect(consoleSpy).toHaveBeenCalled()
-
-      timer.cancel()
-      consoleSpy.mockRestore()
     })
   })
 

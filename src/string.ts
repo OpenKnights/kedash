@@ -27,8 +27,8 @@ export function insertAt(
  */
 export function transformCase(
   source: string,
-  separators: [string, string] = ['', ''],
-  caseRules: CaseTypeTuple = ['upper', 'upper']
+  separators: [string, string] = [' ', ''],
+  caseRules: CaseTypeTuple = ['upper', 'lower']
 ): string {
   if (!isString(source) || !source.trim()) return source
 

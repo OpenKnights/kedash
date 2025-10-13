@@ -11,11 +11,11 @@ import { iterate } from './array'
  * - setSerialInterval: Waits for the previous execution to complete, then waits X milliseconds before executing the next one
  *
  */
-export async function setSerialInterval(
+export function setSerialInterval(
   execute: (...args: any[]) => any,
   delay: number = 0,
   immediate: boolean = false
-): Promise<TimerControl> {
+): TimerControl {
   let timerId: ReturnType<typeof setTimeout> | null = null
   let isCancelled = false
 
@@ -38,11 +38,9 @@ export async function setSerialInterval(
 
   // Execute immediately if needed
   if (immediate) {
-    await execute()
-  }
-
-  // Schedule the first execution (if immediate is true, this is the second execution)
-  if (!isCancelled) {
+    scheduleNext()
+  } else {
+    // Schedule the first execution
     timerId = setTimeout(scheduleNext, delay)
   }
 

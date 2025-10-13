@@ -29,7 +29,9 @@ describe('async utilities', () => {
 
     it('should return [error, undefined] for failing sync function', () => {
       const fn = tryit(() => {
-        return new Error('test error')
+        throw new Error('test error')
+
+        return false
       })
 
       const [error, result] = fn()

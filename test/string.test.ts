@@ -11,7 +11,7 @@ describe('string utilities', () => {
 
     it('should handle negative positions', () => {
       expect(insertAt('hello', -1, 'X')).toBe('hellXo')
-      expect(insertAt('hello', -3, 'X')).toBe('helXlo')
+      expect(insertAt('hello', -3, 'X')).toBe('heXllo')
       expect(insertAt('hello', -10, 'X')).toBe('Xhello') // Beyond start
     })
 
