@@ -27,7 +27,7 @@ export const group = <T, Key extends string | number | symbol>(
 export const sort = <T>(
   array: readonly T[],
   type: SortType = 'ASC',
-  getter: (item: T) => number
+  getter: (item: T) => number = (i) => i as number
 ) => {
   if (!array) return []
   const asc = (a: T, b: T) => getter(a) - getter(b)
@@ -42,6 +42,8 @@ export function bubblingSort<T>(
 ): T[] {
   if (!(Array.isArray(array) && array.length > 1)) return array
 
+  const arr = array.slice()
+
   const compare = (a: T, b: T) => {
     if (type === 'DESC') {
       return getter(b) - getter(a)
@@ -50,12 +52,12 @@ export function bubblingSort<T>(
     }
   }
 
-  for (let i = 0; i < array.length - 1; i++) {
+  for (let i = 0; i < arr.length - 1; i++) {
     let swapped = false
 
-    for (let j = 0; j < array.length - 1 - i; j++) {
-      if (compare(array[j], array[j + 1]) > 0) {
-        ;[array[j], array[j + 1]] = [array[j + 1], array[j]]
+    for (let j = 0; j < arr.length - 1 - i; j++) {
+      if (compare(arr[j], arr[j + 1]) > 0) {
+        ;[arr[j], arr[j + 1]] = [arr[j + 1], arr[j]]
         swapped = true
       }
     }
@@ -63,7 +65,7 @@ export function bubblingSort<T>(
     if (!swapped) break
   }
 
-  return array
+  return arr
 }
 
 /**
