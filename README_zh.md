@@ -1,6 +1,6 @@
 # Kedash
 
-> A lightweight, fully typed TypeScript utility library that provides essential functions for working with arrays, objects, strings, dates, and async operations.
+> 轻量级、完全类型化的 TypeScript 工具库,提供数组、对象、字符串、日期和异步操作的基础函数。
 
 [![npm version](https://img.shields.io/npm/v/kedash.svg)](https://www.npmjs.com/package/kedash)
 [![npm downloads](https://img.shields.io/npm/dm/kedash.svg)](https://www.npmjs.com/package/kedash)
@@ -9,15 +9,15 @@
 
 [English](README.md) | [简体中文](README_zh.md)
 
-## ✨ Features
+## ✨ 特性
 
-- 🎯 **Fully Typed** - Written in TypeScript with comprehensive type definitions
-- 🪶 **Lightweight** - Zero dependencies, tree-shakeable
-- 🚀 **Modern** - ES6+ syntax, supports ESM
-- 🛡️ **Reliable** - Well-tested utility functions
-- 📦 **Modular** - Import only what you need
+- 🎯 **完全类型化** - 使用 TypeScript 编写,具有完整的类型定义
+- 🪶 **轻量级** - 零依赖,支持 tree-shaking
+- 🚀 **现代化** - ES6+ 语法,支持 ESM
+- 🛡️ **可靠** - 经过充分测试的工具函数
+- 📦 **模块化** - 按需导入
 
-## 📦 Installation
+## 📦 安装
 
 ```bash
 npm install kedash
@@ -31,12 +31,12 @@ pnpm add kedash
 yarn add kedash
 ```
 
-## 🚀 Quick Start
+## 🚀 快速开始
 
 ```typescript
 import { debounce, deepClone, formatDate, group } from 'kedash'
 
-// Group array items
+// 数组分组
 const users = [
   { name: 'John', role: 'admin' },
   { name: 'Jane', role: 'user' },
@@ -45,26 +45,26 @@ const users = [
 const grouped = group(users, (user) => user.role)
 // { admin: [{...}, {...}], user: [{...}] }
 
-// Debounce function
+// 防抖函数
 const search = debounce((query: string) => {
-  console.log('Searching:', query)
+  console.log('搜索:', query)
 }, 300)
 
-// Format dates
+// 格式化日期
 formatDate(new Date(), 'yyyy-MM-dd HH:mm:ss')
 // "2025-10-14 15:30:45"
 
-// Deep clone objects
+// 深拷贝对象
 const cloned = deepClone({ nested: { data: [1, 2, 3] } })
 ```
 
-## 📚 API Documentation
+## 📚 API 文档
 
-### Array
+### 数组操作
 
 #### `group<T, Key>(array, getGroupId)`
 
-Groups array items by a key function.
+根据键函数对数组项进行分组。
 
 ```typescript
 const items = [
@@ -78,7 +78,7 @@ const result = group(items, (item) => item.category)
 
 #### `sort<T>(array, type?, getter)`
 
-Sorts an array without modifying the original.
+对数组进行排序而不修改原数组。
 
 ```typescript
 const numbers = [3, 1, 4, 1, 5]
@@ -88,7 +88,7 @@ sort(numbers, 'DESC', (x) => x) // [5, 4, 3, 1, 1]
 
 #### `bubblingSort<T>(array, type?, getter)`
 
-Bubble sort implementation.
+冒泡排序实现。
 
 ```typescript
 const arr = [64, 34, 25, 12, 22]
@@ -97,7 +97,7 @@ bubblingSort(arr, 'ASC') // [12, 22, 25, 34, 64]
 
 #### `iterate<T>(count, func, initValue)`
 
-Iterates a function N times with accumulator.
+使用累加器迭代函数 N 次。
 
 ```typescript
 iterate(5, (acc, i) => acc + i, 0) // 15 (1+2+3+4+5)
@@ -105,20 +105,20 @@ iterate(5, (acc, i) => acc + i, 0) // 15 (1+2+3+4+5)
 
 ---
 
-### Async
+### 异步操作
 
 #### `sleep(milliseconds)`
 
-Async delay utility.
+异步延迟工具。
 
 ```typescript
-await sleep(1000) // Wait 1 second
-console.log('Done!')
+await sleep(1000) // 等待 1 秒
+console.log('完成!')
 ```
 
 #### `tryit<Args, Return>(func)`
 
-Error-first callback style wrapper for sync/async functions.
+错误优先的回调风格包装器,用于同步/异步函数。
 
 ```typescript
 const safeFunc = tryit(async (id: number) => {
@@ -128,49 +128,49 @@ const safeFunc = tryit(async (id: number) => {
 
 const [error, result] = await safeFunc(123)
 if (error) {
-  console.error('Failed:', error)
+  console.error('失败:', error)
 } else {
-  console.log('Success:', result)
+  console.log('成功:', result)
 }
 ```
 
 ---
 
-### Function Utilities
+### 函数工具
 
 #### `debounce<T>(callback, delay?, immediate?)`
 
-Debounces a function with optional immediate execution.
+对函数进行防抖处理,可选立即执行。
 
 ```typescript
 const debouncedSearch = debounce((query: string) => {
   api.search(query)
 }, 300)
 
-// Cancel debounced function
+// 取消防抖函数
 debouncedSearch.cancel()
 ```
 
 #### `throttle<T>(callback, interval, options?)`
 
-Throttles a function with leading/trailing options.
+对函数进行节流处理,支持前缘/后缘选项。
 
 ```typescript
 const throttledScroll = throttle(
   () => {
-    console.log('Scroll event')
+    console.log('滚动事件')
   },
   100,
   { leading: true, trailing: false }
 )
 
-// Cancel throttled function
+// 取消节流函数
 throttledScroll.cancel()
 ```
 
 #### `currying(fn)`
 
-Converts a function to curried version.
+将函数转换为柯里化版本。
 
 ```typescript
 const add = (a: number, b: number, c: number) => a + b + c
@@ -183,7 +183,7 @@ curriedAdd(1)(2, 3) // 6
 
 #### `compose(...fns)`
 
-Composes multiple functions from left to right.
+从左到右组合多个函数。
 
 ```typescript
 const addOne = (x: number) => x + 1
@@ -195,22 +195,21 @@ composed(5) // (5 + 1) * 2 = 12
 
 ---
 
-### Date
+### 日期处理
 
-#### `formatDate(date, format?)`
+#### `formatDate(date, format?, options?)`
 
-Formats dates with customizable patterns.
+使用可自定义模式格式化日期。
 
 ```typescript
 const date = new Date('2025-10-14 15:30:45')
 
 formatDate(date, 'yyyy-MM-dd') // "2025-10-14"
-formatDate(date, 'yyyy Year MM Month dd Day') // "2025 Year 10 Month 14 Day"
+formatDate(date, 'yyyy年MM月dd日') // "2025年10月14日"
 formatDate(date, 'HH:mm:ss') // "15:30:45"
-const { year, month, day, weekNum } = formatDate(date, null)
-const weekStr = `${year}-${month}-${day} Week day ${weekNum}` // "2025-10-14 Week day 1"
+formatDate(date, 'yyyy-MM-dd 星期W') // "2025-10-14 星期二"
 
-// Get format values object
+// 获取格式化值对象
 formatDate(date, null)
 // {
 //   year: "2025",
@@ -224,23 +223,23 @@ formatDate(date, null)
 // }
 ```
 
-**Available Patterns:**
+**可用模式:**
 
-- `yyyy` - Full year (2025)
-- `MM` - Month (01-12)
-- `dd` - Day (01-31)
-- `HH` - Hours (00-23)
-- `mm` - Minutes (00-59)
-- `ss` - Seconds (00-59)
-- `W` - Day of week (中文)
+- `yyyy` - 完整年份 (2025)
+- `MM` - 月份 (01-12)
+- `dd` - 日期 (01-31)
+- `HH` - 小时 (00-23)
+- `mm` - 分钟 (00-59)
+- `ss` - 秒数 (00-59)
+- `W` - 星期几 (中文)
 
 ---
 
-### Object
+### 对象操作
 
 #### `deepClone<T>(source, hash?)`
 
-Deep clones objects, arrays, Map, Set, and handles circular references.
+深度克隆对象、数组、Map、Set,并处理循环引用。
 
 ```typescript
 const original = {
@@ -251,35 +250,35 @@ const original = {
 }
 
 const cloned = deepClone(original)
-cloned.nested.age = 31 // Original unchanged
+cloned.nested.age = 31 // 原对象不变
 ```
 
-**Supports:**
+**支持:**
 
-- Primitive types
-- Objects and arrays
-- Map and Set
-- Symbol keys
-- Circular references
+- 基本类型
+- 对象和数组
+- Map 和 Set
+- Symbol 键
+- 循环引用
 
 #### `shallowClone<T>(obj)`
 
-Creates a shallow copy of a value.
+创建值的浅拷贝。
 
 ```typescript
 const obj = { a: 1, b: { c: 2 } }
 const shallow = shallowClone(obj)
-shallow.a = 99 // Original unchanged
-shallow.b.c = 99 // Original CHANGED (shallow copy)
+shallow.a = 99 // 原对象不变
+shallow.b.c = 99 // 原对象改变(浅拷贝)
 ```
 
 ---
 
-### String
+### 字符串操作
 
 #### `insertAt(source, position, text)`
 
-Inserts text at a specified position.
+在指定位置插入文本。
 
 ```typescript
 insertAt('Hello World', 5, ',') // "Hello, World"
@@ -288,29 +287,29 @@ insertAt('Hello', -1, '!') // "Hell!o"
 
 #### `transformCase(source, separators?, caseRules?)`
 
-Transforms string case with custom rules.
+使用自定义规则转换字符串大小写。
 
 ```typescript
-// CamelCase
+// 驼峰命名
 transformCase('hello world', [' ', ''], ['lower', 'upper'])
 // "helloWorld"
 
-// PascalCase
+// 帕斯卡命名
 transformCase('hello world', [' ', ''], ['upper', 'upper'])
 // "HelloWorld"
 
-// kebab-case
+// 短横线命名
 transformCase('Hello World', [' ', '-'], ['lower', 'lower'])
 // "hello-world"
 ```
 
 ---
 
-### Type Checking
+### 类型检查
 
 #### `isType(type, target)`
 
-Checks if a value is of specified type.
+检查值是否为指定类型。
 
 ```typescript
 isType('string', 'hello') // true
@@ -320,7 +319,7 @@ isType('map', new Map()) // true
 
 #### `getType<T>(target)`
 
-Gets the exact type name.
+获取准确的类型名称。
 
 ```typescript
 getType('hello') // "string"
@@ -329,7 +328,7 @@ getType(new Map()) // "map"
 getType(null) // "null"
 ```
 
-#### Type Guards
+#### 类型守卫
 
 ```typescript
 isString(value) // value is string
@@ -343,46 +342,46 @@ isFunction(value) // value is function
 isDate(value) // value is Date
 isPromise(value) // value is Promise
 isSymbol(value) // value is symbol
-isPrimitive(value) // primitive type
-isEmpty(value) // empty check
-isEqual(x, y) // deep equality
+isPrimitive(value) // 基本类型
+isEmpty(value) // 空值检查
+isEqual(x, y) // 深度相等
 ```
 
 ---
 
-### Other Utilities
+### 其他工具
 
 #### `setSerialInterval(execute, delay?, immediate?)`
 
-Serial interval that waits for previous execution to complete.
+串行间隔执行,等待上一次执行完成。
 
 ```typescript
 const timer = setSerialInterval(async () => {
   await someAsyncTask()
-  console.log('Task completed')
+  console.log('任务完成')
 }, 1000)
 
-// Cancel timer
+// 取消定时器
 timer.cancel()
 ```
 
-**Difference from setInterval:**
+**与 setInterval 的区别:**
 
-- `setInterval`: Triggers every X ms (regardless of completion)
-- `setSerialInterval`: Waits for completion, then waits X ms
+- `setInterval`: 每 X 毫秒触发一次(无论是否完成)
+- `setSerialInterval`: 等待完成后,再等待 X 毫秒
 
 #### `random(min, max)`
 
-Generates random integer between min and max (inclusive).
+生成 min 和 max 之间的随机整数(包含边界)。
 
 ```typescript
-random(1, 10) // Random number between 1-10
-random(0, 100) // Random number between 0-100
+random(1, 10) // 1-10 之间的随机数
+random(0, 100) // 0-100 之间的随机数
 ```
 
 #### `uid(length, specials?)`
 
-Generates unique ID string.
+生成唯一 ID 字符串。
 
 ```typescript
 uid(8) // "aB3kL9mQ"
@@ -391,7 +390,7 @@ uid(16, '!@#') // "aB3!kL9@mQ#xY2z"
 
 #### `toQueryString(params)`
 
-Converts object to URL query string.
+将对象转换为 URL 查询字符串。
 
 ```typescript
 toQueryString({ name: 'John', age: 25 })
@@ -406,11 +405,11 @@ toQueryString({
 
 ---
 
-### Number
+### 数字处理
 
 #### `toFloat<T>(value, defaultValue?)`
 
-Safely converts to float with default value.
+安全地转换为浮点数,支持默认值。
 
 ```typescript
 toFloat('3.14') // 3.14
@@ -420,7 +419,7 @@ toFloat(null, null) // null
 
 #### `toInt<T>(value, defaultValue?)`
 
-Safely converts to integer with default value.
+安全地转换为整数,支持默认值。
 
 ```typescript
 toInt('42') // 42
@@ -430,7 +429,7 @@ toInt(null, null) // null
 
 #### `padNumber(value)`
 
-Pads number to two digits.
+将数字填充为两位数。
 
 ```typescript
 padNumber(5) // "05"
@@ -439,9 +438,9 @@ padNumber(12) // "12"
 
 ---
 
-## 🎯 Use Cases
+## 🎯 使用场景
 
-### Form Validation with Debounce
+### 表单验证与防抖
 
 ```typescript
 import { debounce, isEmpty } from 'kedash'
@@ -453,7 +452,7 @@ const validateEmail = debounce(async (email: string) => {
 }, 500)
 ```
 
-### Data Grouping and Sorting
+### 数据分组与排序
 
 ```typescript
 import { group, sort } from 'kedash'
@@ -467,7 +466,7 @@ const sortedPending = sort(
 )
 ```
 
-### Safe API Calls
+### 安全的 API 调用
 
 ```typescript
 import { sleep, tryit } from 'kedash'
@@ -478,14 +477,14 @@ const fetchWithRetry = async (url: string, retries = 3) => {
   for (let i = 0; i < retries; i++) {
     const [error, response] = await safeFetch(url)
     if (!error) return response
-    await sleep(1000 * (i + 1)) // Exponential backoff
+    await sleep(1000 * (i + 1)) // 指数退避
   }
 
-  throw new Error('Max retries reached')
+  throw new Error('达到最大重试次数')
 }
 ```
 
-### Complex Object Cloning
+### 复杂对象克隆
 
 ```typescript
 import { deepClone } from 'kedash'
@@ -497,19 +496,19 @@ const state = {
 }
 
 const newState = deepClone(state)
-// Fully independent copy with all nested structures
+// 完全独立的副本,包含所有嵌套结构
 ```
 
-## 🤝 Contributing
+## 🤝 贡献
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+欢迎贡献代码!请随时提交 Pull Request。
 
-## 📄 License
+## 📄 许可证
 
-[MIT License](LICENSE) © OpenKnights Contributors
+[MIT 许可证](LICENSE) © OpenKnights 贡献者
 
-## 🔗 Links
+## 🔗 链接
 
-- [GitHub Repository](https://github.com/coderking3/kedash)
-- [NPM Package](https://www.npmjs.com/package/kedash)
+- [GitHub 仓库](https://github.com/coderking3/kedash)
+- [NPM 包](https://www.npmjs.com/package/kedash)
 - [Issues](https://github.com/coderking3/kedash/issues)
