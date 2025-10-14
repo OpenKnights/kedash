@@ -16,6 +16,12 @@ const eslintConfig = defineConfig(
         }
       ]
     }
+  },
+  {
+    files: ['**/*.md', '**/*.md/**'], // 更完整的 glob 模式
+    rules: {
+      'unused-imports/no-unused-vars': 'off'
+    }
   }
 )
 
