@@ -106,7 +106,7 @@ describe('object utilities', () => {
     })
 
     it('should clone Map', () => {
-      const map = new Map([
+      const map = new Map<string, number | Record<string, any>>([
         ['a', 1],
         ['b', { c: 2 }]
       ])
