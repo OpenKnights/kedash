@@ -1,6 +1,11 @@
-import type { DateFormatValues } from './types'
+import type {
+  DateFormatValues,
+  FormatDateOptions,
+  WeekDay,
+  WeekNamesRecord
+} from './types'
 import { padNumber } from './number'
-import { isString } from './typed'
+import { isObject, isString } from './typed'
 
 // Formatting rule mapping
 const FORMAT_PATTERNS = new Map<string, keyof DateFormatValues>([
@@ -10,25 +15,57 @@ const FORMAT_PATTERNS = new Map<string, keyof DateFormatValues>([
   ['HH', 'hours'],
   ['mm', 'minutes'],
   ['ss', 'seconds'],
-  ['W', 'week']
+  ['WK', 'week']
 ])
 
 // Weekly Map
-const WEEK_NAMES = new Map<number, string>([
-  [0, '日'],
-  [1, '一'],
-  [2, '二'],
-  [3, '三'],
-  [4, '四'],
-  [5, '五'],
-  [6, '六']
-])
+function toWeekMap(names: WeekNamesRecord): Map<WeekDay, string> {
+  return new Map(
+    (Object.entries(names) as [string, string][]).map(([k, v]) => [
+      Number(k) as WeekDay,
+      v
+    ])
+  )
+}
+
+const WEEK_NAMES_ZH = toWeekMap({
+  0: '日',
+  1: '一',
+  2: '二',
+  3: '三',
+  4: '四',
+  5: '五',
+  6: '六'
+})
+
+const WEEK_NAMES_EN = toWeekMap({
+  0: 'Sunday',
+  1: 'Monday',
+  2: 'Tuesday',
+  3: 'Wednesday',
+  4: 'Thursday',
+  5: 'Friday',
+  6: 'Saturday'
+})
+
+function returnWeekNames(
+  wk: FormatDateOptions['weekNames']
+): Map<WeekDay, string> {
+  if (wk === 'zh') return WEEK_NAMES_ZH
+  if (wk === 'en') return WEEK_NAMES_EN
+  if (isObject(wk)) return toWeekMap(wk)
+
+  return WEEK_NAMES_ZH
+}
 
 /**
  * Create a date format value object
  */
-function createDateValues(date: Date): DateFormatValues {
-  const dayOfWeek = date.getDay()
+function createDateValues(
+  date: Date,
+  weekNames: Map<WeekDay, string>
+): DateFormatValues {
+  const dayOfWeek = date.getDay() as WeekDay
 
   return {
     year: date.getFullYear().toString(),
@@ -37,19 +74,28 @@ function createDateValues(date: Date): DateFormatValues {
     hours: padNumber(date.getHours()),
     minutes: padNumber(date.getMinutes()),
     seconds: padNumber(date.getSeconds()),
-    week: WEEK_NAMES.get(dayOfWeek) || '',
+    week: weekNames.get(dayOfWeek) || '',
     weekNum: dayOfWeek
   }
 }
 
-export function formatDate(date: string | number | Date, format: string): string
+export function formatDate(
+  date: string | number | Date,
+  format: string,
+  options?: FormatDateOptions
+): string
 
 export function formatDate(
   date: string | number | Date,
-  format: null | undefined
+  format: null | undefined,
+  options?: FormatDateOptions
 ): DateFormatValues
 
-export function formatDate(date: string | number | Date): string
+export function formatDate(
+  date: string | number | Date,
+  format?: string,
+  options?: FormatDateOptions
+): string
 
 /**
  * Formatting Dates
@@ -60,14 +106,14 @@ export function formatDate(date: string | number | Date): string
  */
 export function formatDate(
   date: string | number | Date,
-  format: string | null = 'yyyy-MM-dd HH:mm:ss'
+  format: string | null = 'yyyy-MM-dd HH:mm:ss',
+  options?: FormatDateOptions
 ): string | DateFormatValues {
-  if (!date) {
-    return new Date().toISOString()
-  }
+  if (!date) return new Date().toISOString()
 
+  const { weekNames = 'zh' } = options || {}
   const dateObj = new Date(date || new Date())
-  const dateValues = createDateValues(dateObj)
+  const dateValues = createDateValues(dateObj, returnWeekNames(weekNames))
 
   if ((isString(format) && !format.trim()) || !format) {
     return dateValues
