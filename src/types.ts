@@ -38,6 +38,15 @@ export interface DateFormatValues {
   weekNum: number
 }
 
+type weekNamesType = 'zh' | 'en'
+
+export interface FormatDateOptions {
+  weekNames?: WeekNamesRecord | weekNamesType
+}
+
+export type WeekDay = 0 | 1 | 2 | 3 | 4 | 5 | 6
+export type WeekNamesRecord = Record<WeekDay, string>
+
 /* timer */
 export interface TimerControl {
   cancel: () => void
