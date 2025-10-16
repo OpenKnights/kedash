@@ -199,29 +199,15 @@ composed(5) // (5 + 1) * 2 = 12
 
 #### `formatDate(date, format?, options?)`
 
-使用可自定义模式格式化日期。
+使用可自定义模式和语言环境格式化日期。
 
-```typescript
-const date = new Date('2025-10-14 15:30:45')
+**参数:**
 
-formatDate(date, 'yyyy-MM-dd') // "2025-10-14"
-formatDate(date, 'yyyy年MM月dd日') // "2025年10月14日"
-formatDate(date, 'HH:mm:ss') // "15:30:45"
-formatDate(date, 'yyyy-MM-dd 星期W') // "2025-10-14 星期二"
-
-// 获取格式化值对象
-formatDate(date, null)
-// {
-//   year: "2025",
-//   month: "10",
-//   day: "14",
-//   hours: "15",
-//   minutes: "30",
-//   seconds: "45",
-//   week: "二",
-//   weekNum: 2
-// }
-```
+- `date`: `string | number | Date` - 要格式化的日期
+- `format`: `string | null` - 格式化模式 (默认: `'yyyy-MM-dd HH:mm:ss'`)
+  - 传入 `null` 或空字符串可获取格式化值对象
+- `options`: `FormatDateOptions` (可选)
+  - `weekNames`: `'zh' | 'en' | WeekNamesRecord` - 星期名称语言或自定义星期名称 (默认: `'zh'`)
 
 **可用模式:**
 
@@ -231,7 +217,73 @@ formatDate(date, null)
 - `HH` - 小时 (00-23)
 - `mm` - 分钟 (00-59)
 - `ss` - 秒数 (00-59)
-- `W` - 星期几 (中文)
+- `WK` - 星期几 (取决于语言设置)
+
+```typescript
+const date = new Date('2025-10-14 15:30:45')
+
+/* ===== 基础用法 ===== */
+
+// 默认格式 (中文星期)
+formatDate(date) // "2025-10-14 15:30:45"
+
+// 自定义格式
+formatDate(date, 'yyyy/MM/dd') // "2025/10/14"
+formatDate(date, 'yyyy年MM月dd日') // "2025年10月14日"
+formatDate(date, 'HH:mm:ss') // "15:30:45"
+
+/* ===== 星期名称支持 ===== */
+
+// 中文星期名称 (默认)
+formatDate(date, 'yyyy-MM-dd 星期WK')
+// "2025-10-14 星期二"
+
+// 英文星期名称
+formatDate(date, 'yyyy-MM-dd WK', { weekNames: 'en' })
+// "2025-10-14 Tuesday"
+
+// 自定义星期名称
+formatDate(date, 'yyyy-MM-dd WK', {
+  weekNames: {
+    1: '周一',
+    2: '周二',
+    3: '周三',
+    4: '周四',
+    5: '周五',
+    6: '周六',
+    0: '周日'
+  }
+})
+// "2025-10-14 周二"
+
+/* ===== 获取格式化值对象 ===== */
+
+// 中文星期名称
+const values = formatDate(date, null)
+// {
+//   year: "2025",
+//   month: "10",
+//   day: "14",
+//   hours: "15",
+//   minutes: "30",
+//   seconds: "45",
+//   week: "二",      // 中文星期二
+//   weekNum: 2       // 星期数字 (0-6)
+// }
+
+// 英文星期名称
+const valuesEn = formatDate(date, null, { weekNames: 'en' })
+// {
+//   ...
+//   week: "Tuesday",
+//   weekNum: 2
+// }
+
+// 使用解构
+const { year, month, day, weekNum } = formatDate(date, null)
+const customFormat = `${year}-${month}-${day} (第${weekNum}天)`
+// "2025-10-14 (第2天)"
+```
 
 ---
 

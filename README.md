@@ -197,32 +197,17 @@ composed(5) // (5 + 1) * 2 = 12
 
 ### Date
 
-#### `formatDate(date, format?)`
+#### `formatDate(date, format?, options?)`
 
-Formats dates with customizable patterns.
+Formats dates with customizable patterns and locale support.
 
-```typescript
-const date = new Date('2025-10-14 15:30:45')
+**Parameters:**
 
-formatDate(date, 'yyyy-MM-dd') // "2025-10-14"
-formatDate(date, 'yyyy Year MM Month dd Day') // "2025 Year 10 Month 14 Day"
-formatDate(date, 'HH:mm:ss') // "15:30:45"
-const { year, month, day, weekNum } = formatDate(date, null)
-const weekStr = `${year}-${month}-${day} Week day ${weekNum}` // "2025-10-14 Week day 1"
-
-// Get format values object
-formatDate(date, null)
-// {
-//   year: "2025",
-//   month: "10",
-//   day: "14",
-//   hours: "15",
-//   minutes: "30",
-//   seconds: "45",
-//   week: "二",
-//   weekNum: 2
-// }
-```
+- `date`: `string | number | Date` - The date to format
+- `format`: `string | null` - Format pattern (default: `'yyyy-MM-dd HH:mm:ss'`)
+  - Pass `null` or empty string to get the formatted value object
+- `options`: `FormatDateOptions` (optional)
+  - `weekNames`: `'zh' | 'en' | WeekNamesRecord` - Week name locale or custom week names (default: `'zh'`)
 
 **Available Patterns:**
 
@@ -232,7 +217,73 @@ formatDate(date, null)
 - `HH` - Hours (00-23)
 - `mm` - Minutes (00-59)
 - `ss` - Seconds (00-59)
-- `W` - Day of week (中文)
+- `WK` - Day of week (locale-dependent)
+
+```typescript
+const date = new Date('2025-10-14 15:30:45')
+
+/* ===== Basic Usage ===== */
+
+// Default format (Chinese week names)
+formatDate(date) // "2025-10-14 15:30:45"
+
+// Custom format
+formatDate(date, 'yyyy/MM/dd') // "2025/10/14"
+formatDate(date, 'yyyy年MM月dd日') // "2025年10月14日"
+formatDate(date, 'HH:mm:ss') // "15:30:45"
+
+/* ===== Week Names Support ===== */
+
+// Chinese week names (default)
+formatDate(date, 'yyyy-MM-dd 星期WK')
+// "2025-10-14 星期二"
+
+// English week names
+formatDate(date, 'yyyy-MM-dd WK', { weekNames: 'en' })
+// "2025-10-14 Tuesday"
+
+// Custom week names
+formatDate(date, 'yyyy-MM-dd WK', {
+  weekNames: {
+    0: 'Sun',
+    1: 'Mon',
+    2: 'Tue',
+    3: 'Wed',
+    4: 'Thu',
+    5: 'Fri',
+    6: 'Sat'
+  }
+})
+// "2025-10-14 Tue"
+
+/* ===== Get Formatted Value Object ===== */
+
+// Chinese week names
+const values = formatDate(date, null)
+// {
+//   year: "2025",
+//   month: "10",
+//   day: "14",
+//   hours: "15",
+//   minutes: "30",
+//   seconds: "45",
+//   week: "二",      // Tuesday in Chinese
+//   weekNum: 2       // Day of week number (0-6)
+// }
+
+// English week names
+const valuesEn = formatDate(date, null, { weekNames: 'en' })
+// {
+//   ...
+//   week: "Tuesday",
+//   weekNum: 2
+// }
+
+// Use destructuring
+const { year, month, day, weekNum } = formatDate(date, null)
+const customFormat = `${year}-${month}-${day} (Day ${weekNum})`
+// "2025-10-14 (Day 2)"
+```
 
 ---
 
