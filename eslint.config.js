@@ -14,7 +14,8 @@ const eslintConfig = defineConfig(
           varsIgnorePattern: '^_',
           argsIgnorePattern: '^_'
         }
-      ]
+      ],
+      'regexp/no-unused-capturing-group': 'off'
     }
   },
   {
