@@ -324,6 +324,57 @@ shallow.a = 99 // 原对象不变
 shallow.b.c = 99 // 原对象改变(浅拷贝)
 ```
 
+#### `transformObjectValues<Input, Output>(data, options?)`
+
+将对象中的字符串值转换为适当的类型。
+
+```typescript
+const trObj = {
+  userInfo: { name: 'king3', age: '18', sex: 'male' },
+  isAdmin: 'false',
+  wallet: { balance: '2768420.63¥' }
+}
+
+interface objInput {
+  userInfo: { name: string; age: string; sex: string }
+  isAdmin: string
+  wallet: { balance: string }
+}
+interface objOutput {
+  userInfo: { name: string; age: number; sex: string }
+  isAdmin: boolean
+  wallet: { balance: '2,768,420.63¥' }
+}
+
+const transformArgs: [objInput, TransformOptions] = [
+  trObj,
+  {
+    deep: true,
+    parseNumbers: true,
+    transformer: createTransformer({
+      balance: (val: string) => {
+        const balance = Number(val.slice(0, -1))
+        return `${balance.toLocaleString()}¥`
+      }
+    })
+  }
+]
+
+const transformObj = transformObjectValues<objInput, objOutput>(
+  ...transformArgs
+)
+
+const {
+  wallet: { balance },
+  isAdmin
+} = transformObj
+
+console.log(`🚀 ~ transformObj:`, transformObj)
+console.log(`🚀 ~ balance:`, balance) // '2,768,420.63¥'
+console.log(`🚀 ~ balance === '2,768,420.63¥':`, balance === '2,768,420.63¥') // true
+console.log(`🚀 ~ isAdmin:`, isAdmin) // true
+```
+
 ---
 
 ### 字符串操作
@@ -453,6 +504,85 @@ toQueryString({
   page: 1
 })
 // "filter[status]=active&filter[type]=user&page=1"
+```
+
+#### `getQueryParams(keys，options?)`
+
+从 URL 中获取查询参数。
+
+// 从当前 URL 获取
+getQueryParams(['page', 'filter'])
+
+```typescript
+// 返回：{ page: '2', filter: 'active' }
+
+// 从自定义 URL 获取
+getQueryParams(['id'], { url: 'https://example.com?id=123&type=post' })
+// 返回：{ id: '123' }
+
+// 获取所有查询参数
+getQueryParams([], { url: 'https://example.com?id=123&type=post', all: true })
+// 返回: { id: '123', type: 'post' }
+
+// 无参数的 URL（自动添加?）
+getQueryParams(['id'], { url: 'https://example.com' })
+// 返回：{ id: undefined }
+```
+
+#### `setQueryParams(params,options?)`
+
+在 URL 中设置或更新查询参数。
+
+```typescript
+// 修改当前 URL
+setQueryParams({ page: 2, filter: 'active' })
+// 当前 URL 变为：?page=2&filter=active
+
+// 返回修改后的自定义 URL
+const newUrl = setQueryParams(
+  { page: 2, filter: 'active' },
+  { url: 'https://example.com/path' }
+)
+// 返回: 'https://example.com/path?page=2&filter=active'
+
+// 带有现有参数的 URL
+const newUrl = setQueryParams(
+  { page: 3 },
+  { url: 'https://example.com?page=1&filter=all' }
+)
+// 返回: 'https://example.com?page=3&filter=all'
+
+// 自定义跳过逻辑
+setQueryParams(
+  { tags: [], status: null },
+  {
+    skipNull: false,
+    skipIf: (key, value) => Array.isArray(value) && value.length === 0
+  }
+)
+```
+
+#### `tryParse(params, options?)`
+
+尝试解析一个 JSON 字符串，并提供后备值。
+
+// 基本用法
+const data = tryParse<User>('{"name":"John"}', {})
+
+```typescript
+// 带验证
+const withValidation = tryParse('{"id":1}', null, {
+  validator: (val): val is User => typeof val.id === 'number'
+})
+
+// 带错误处理
+tryParse(
+  '无效的 JSON',
+  {},
+  {
+    onError: (error, input) => console.log('解析失败:', error)
+  }
+)
 ```
 
 ---

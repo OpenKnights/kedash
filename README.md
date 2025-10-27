@@ -324,6 +324,93 @@ shallow.a = 99 // Original unchanged
 shallow.b.c = 99 // Original CHANGED (shallow copy)
 ```
 
+#### `transformObjectValues<Input, Output>(data, options?)`
+
+Transforms string values in objects to their appropriate types.
+
+```typescript
+const trObj = {
+  userInfo: { name: 'king3', age: '18', sex: 'male' },
+  isAdmin: 'false',
+  wallet: { balance: '2768420.63¥' }
+}
+
+interface objInput {
+  userInfo: { name: string; age: string; sex: string }
+  isAdmin: string
+  wallet: { balance: string }
+}
+interface objOutput {
+  userInfo: { name: string; age: number; sex: string }
+  isAdmin: boolean
+  wallet: { balance: '2,768,420.63¥' }
+}
+
+const transformArgs: [objInput, TransformOptions] = [
+  trObj,
+  {
+    deep: true,
+    parseNumbers: true,
+    transformer: createTransformer({
+      balance: (val: string) => {
+        const balance = Number(val.slice(0, -1))
+        return `${balance.toLocaleString()}¥`
+      }
+    })
+  }
+]
+
+const transformObj = transformObjectValues<objInput, objOutput>(
+  ...transformArgs
+)
+
+const {
+  wallet: { balance },
+  isAdmin
+} = transformObj
+
+console.log(`🚀 ~ transformObj:`, transformObj)
+console.log(`🚀 ~ balance:`, balance) // '2,768,420.63¥'
+console.log(`🚀 ~ balance === '2,768,420.63¥':`, balance === '2,768,420.63¥') // true
+console.log(`🚀 ~ isAdmin:`, isAdmin) // true
+```
+
+**Smart conversion supported:**
+
+- "true"/"false" → boolean
+- "null" → null
+- "undefined" → undefined
+- "42" → number (when parseNumbers enabled)
+- "2024-01-01" → Date (when parseDates enabled)
+- "" → null (when emptyStringToNull enabled)
+- "NaN"/"Infinity"/"-Infinity" → special numbers (when parseSpecialNumbers enabled)
+
+##### `createTransformer(rules)`
+
+Creates a custom value transformer with predefined rules
+
+```typescript
+// Basic transformer
+const transformer = createTransformer({
+  date: (val) => (val.match(/^\d{4}-\d{2}-\d{2}$/) ? new Date(val) : val),
+  price: (val) => (typeof val === 'string' ? Number.parseFloat(val) : val)
+})
+
+// Number formatting transformer
+const formatTransformer = createTransformer({
+  amount: (val) => (typeof val === 'number' ? val.toLocaleString() : val),
+  count: (val) => (typeof val === 'number' ? val.toLocaleString() : val)
+})
+
+// Wildcard transformer (applies to all keys)
+const trimTransformer = createTransformer({
+  '*': (val) => (typeof val === 'string' ? val.trim() : val)
+})
+
+// Use with transformObjectValues
+transformObjectValues(data, { transformer })
+```
+
 ---
 
 ### String
@@ -453,6 +540,84 @@ toQueryString({
   page: 1
 })
 // "filter[status]=active&filter[type]=user&page=1"
+```
+
+#### `getQueryParams(keys，options?)`
+
+Gets query parameters from URL.
+
+```typescript
+// Get from current URL
+getQueryParams(['page', 'filter'])
+// Returns: { page: '2', filter: 'active' }
+
+// Get from custom URL
+getQueryParams(['id'], { url: 'https://example.com?id=123&type=post' })
+// Returns: { id: '123' }
+
+// Get all query params
+getQueryParams([], { url: 'https://example.com?id=123&type=post', all: true })
+// Returns: { id: '123', type: 'post' }
+
+// URL without params (automatically adds ?)
+getQueryParams(['id'], { url: 'https://example.com' })
+// Returns: { id: undefined }
+```
+
+#### `setQueryParams(params, options?)`
+
+Sets or updates query parameters in URL.
+
+```typescript
+// Modify current URL
+setQueryParams({ page: 2, filter: 'active' })
+// Current URL becomes: ?page=2&filter=active
+
+// Return modified custom URL
+const newUrl = setQueryParams(
+  { page: 2, filter: 'active' },
+  { url: 'https://example.com/path' }
+)
+// Returns: 'https://example.com/path?page=2&filter=active'
+
+// URL with existing params
+const newUrl = setQueryParams(
+  { page: 3 },
+  { url: 'https://example.com?page=1&filter=all' }
+)
+// Returns: 'https://example.com?page=3&filter=all'
+
+// Custom skip logic
+setQueryParams(
+  { tags: [], status: null },
+  {
+    skipNull: false,
+    skipIf: (key, value) => Array.isArray(value) && value.length === 0
+  }
+)
+```
+
+#### `tryParse(params, options?)`
+
+Attempts to parse a JSON string with fallback value.
+
+```typescript
+// Basic usage
+const data = tryParse<User>('{"name":"John"}', {})
+
+// With validation
+const withValidation = tryParse('{"id":1}', null, {
+  validator: (val): val is User => typeof val.id === 'number'
+})
+
+// With error handling
+tryParse(
+  'invalid json',
+  {},
+  {
+    onError: (error, input) => console.log('Parse failed:', error)
+  }
+)
 ```
 
 ---
