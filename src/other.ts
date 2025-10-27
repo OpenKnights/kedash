@@ -1,10 +1,9 @@
 import type {
-  CoerceOptions,
+  GetQueryParamsOptions,
   ParseOptions,
   Recordable,
-  StringifyOptions,
-  TimerControl,
-  ValueTransformer
+  SetQueryParamsOptions,
+  TimerControl
 } from './types'
 
 import { iterate } from './array'
@@ -176,76 +175,129 @@ export function toQueryString(params: Recordable): string {
 }
 
 /**
- * Retrieves specific query parameters from the current URL
+ * Gets query parameters from URL
  *
- * @template T - String union type of the expected parameter keys
  * @param keys - Array of parameter keys to retrieve
- * @returns An object containing the requested parameters with their values (or undefined if not found)
+ * @param options - Configuration options
+ * @returns Object containing the requested parameters
  *
  * @example
  * ```typescript
- * // URL: https://example.com?name=John&age=25
- * getQueryParams(['name', 'age'])
- * // Returns: { name: 'John', age: '25' }
+ * // Get from current URL
+ * getQueryParams(['page', 'filter'])
+ * // Returns: { page: '2', filter: 'active' }
  *
- * // Missing parameters return undefined
- * getQueryParams(['name', 'email'])
- * // Returns: { name: 'John', email: undefined }
+ * // Get from custom URL
+ * getQueryParams(
+ *   ['id'],
+ *   { url: 'https://example.com?id=123&type=post' }
+ * )
+ * // Returns: { id: '123' }
+ *
+ * // Get all query params
+ * getQueryParams(
+ *   [],
+ *   { url: 'https://example.com?id=123&type=post', all: true }
+ * )
+ * // Returns: { id: '123', type: 'post' }
+ *
+ * // URL without params (automatically adds ?)
+ * getQueryParams(['id'], { url: 'https://example.com' })
+ * // Returns: { id: undefined }
  * ```
  */
-export function getQueryParams<T extends string>(
-  keys: T[]
+export function getQueryParams(
+  keys: string[],
+  options: GetQueryParamsOptions = {}
 ): Recordable<string | undefined> {
-  if (!keys || !Array.isArray(keys) || keys.length === 0) {
+  const { url, all = false } = options
+  let params = {} as Recordable<string | undefined>
+
+  if (!all && (!keys || !Array.isArray(keys) || keys.length === 0)) {
     console.error(
       `[GetQueryParams Error]: keys must be a non-empty array of strings`
     )
-    return {} as Recordable<string | undefined>
+    return params
   }
 
-  const searchParams = new URLSearchParams(window.location.search)
-  const params = keys.reduce(
-    (res, key) => {
-      const param = searchParams.get(key)
+  let searchParams: URLSearchParams
 
-      if (param) {
-        res[key] = param
-      } else {
-        res[key] = undefined
-      }
+  if (url) {
+    try {
+      // Parse custom URL
+      const urlObj = new URL(url)
+      searchParams = new URLSearchParams(urlObj.search)
+    } catch {
+      console.error(`[GetQueryParams Error]: Invalid URL provided - ${url}`)
+      return params
+    }
+  } else {
+    // Use current window location
+    searchParams = new URLSearchParams(window.location.search)
+  }
 
-      return res
-    },
-    {} as Recordable<string | undefined>
-  )
+  if (all) {
+    const searchKeys = [...searchParams.keys()]
+    if (searchKeys.length < 1) return params
+
+    searchParams.forEach((value, key) => {
+      params[key] = value ?? undefined
+    })
+  } else {
+    params = keys.reduce(
+      (res, key) => {
+        const param = searchParams.get(key)
+        res[key] = param ?? undefined
+        return res
+      },
+      {} as Recordable<string | undefined>
+    )
+  }
 
   return params
 }
 
 /**
- * Sets or updates query parameters in the current URL without page reload
+ * Sets or updates query parameters in URL
  *
- * Uses history.replaceState to update the URL
- * Skips null, undefined, and empty string values
- *
- * @param params - An object containing the parameters to set or update
+ * @param params - Object containing parameters to set or update
+ * @param options - Configuration options
+ * @returns The modified URL string (if custom URL provided), or void (if modifying window.location)
  *
  * @example
  * ```typescript
- * // Set multiple parameters
+ * // Modify current URL
  * setQueryParams({ page: 2, filter: 'active' })
- * // URL becomes: ?page=2&filter=active
+ * // Current URL becomes: ?page=2&filter=active
  *
- * // Update existing parameters
- * setQueryParams({ page: 3 })
- * // URL becomes: ?page=3&filter=active
+ * // Return modified custom URL
+ * const newUrl = setQueryParams(
+ *   { page: 2, filter: 'active' },
+ *   { url: 'https://example.com/path' }
+ * )
+ * // Returns: 'https://example.com/path?page=2&filter=active'
  *
- * // Empty values are skipped
- * setQueryParams({ page: 3, filter: null })
- * // URL becomes: ?page=3
+ * // URL with existing params
+ * const newUrl = setQueryParams(
+ *   { page: 3 },
+ *   { url: 'https://example.com?page=1&filter=all' }
+ * )
+ * // Returns: 'https://example.com?page=3&filter=all'
+ *
+ * // Custom skip logic
+ * setQueryParams(
+ *   { tags: [], status: null },
+ *   {
+ *     skipNull: false,
+ *     skipIf: (key, value) => Array.isArray(value) && value.length === 0
+ *   }
+ * )
  * ```
  */
-export function setQueryParams(params: Recordable): void {
+export function setQueryParams(
+  params: Recordable,
+  options: SetQueryParamsOptions = {}
+): string | void {
   if (!params || params?.constructor !== Object) {
     console.error(`[SetQueryParams Error]: params must be an object`)
     return
@@ -257,13 +309,55 @@ export function setQueryParams(params: Recordable): void {
     return
   }
 
-  const searchParams = new URLSearchParams(window.location.search)
+  const {
+    url,
+    skipIf,
+    skipNull = false,
+    skipUndefined = false,
+    skipEmptyString = false,
+    trimStrings = false
+  } = options
+
+  let searchParams: URLSearchParams
+  let baseUrl: string
+  let hash: string = ''
+
+  if (url) {
+    try {
+      const urlObj = new URL(url)
+      searchParams = new URLSearchParams(urlObj.search)
+      baseUrl = `${urlObj.origin}${urlObj.pathname}`
+      hash = urlObj.hash
+    } catch {
+      console.error(`[SetQueryParams Error]: Invalid URL provided - ${url}`)
+      return
+    }
+  } else {
+    searchParams = new URLSearchParams(window.location.search)
+    baseUrl = window.location.pathname
+    hash = window.location.hash
+  }
+
+  // Helper function to check if value should be skipped
+  const shouldSkipValue = (key: string, value: any): boolean => {
+    // Check built-in skip conditions
+    if (skipNull && value === null) return true
+    if (skipUndefined && value === undefined) return true
+
+    if (skipEmptyString && typeof value === 'string') {
+      const stringValue = trimStrings ? value.trim() : value
+      if (!stringValue) return true
+    }
+
+    // Check custom skip function
+    if (skipIf && skipIf(key, value)) return true
+
+    return false
+  }
+
+  // Update search params
   for (const [param, value] of keys) {
-    if (
-      value === null ||
-      value === undefined ||
-      (typeof value === 'string' && !value.trim())
-    ) {
+    if (shouldSkipValue(param, value)) {
       continue
     }
 
@@ -271,8 +365,16 @@ export function setQueryParams(params: Recordable): void {
   }
 
   const queryString = searchParams.toString()
-  const newUrl = queryString ? `?${queryString}` : window.location.pathname
+  const newUrl = queryString
+    ? `${baseUrl}?${queryString}${hash}`
+    : `${baseUrl}${hash}`
 
+  // If custom URL provided, return the modified URL
+  if (url) {
+    return newUrl
+  }
+
+  // Otherwise, update window location
   window.history.replaceState({}, '', newUrl)
 }
 
@@ -301,9 +403,6 @@ export function setQueryParams(params: Recordable): void {
  * tryParse('invalid json', {}, {
  *   onError: (error, input) => console.log('Parse failed:', error)
  * })
- *
- * // Chain with coerceValues
- * const normalized = coerceValues(tryParse('{"active":"true"}'))
  * ```
  */
 export function tryParse<T = any>(
@@ -329,267 +428,5 @@ export function tryParse<T = any>(
       onError(error as Error, str)
     }
     return fallback
-  }
-}
-
-/**
- * Safely stringifies a value to JSON with error handling
- *
- * @param value - The value to stringify
- * @param fallback - The fallback string if stringification fails (default: "{}")
- * @param options - Stringification options including replacer, space, and error callback
- * @returns The JSON string or fallback value
- *
- * @example
- * ```typescript
- * // Basic usage
- * const json = tryStringify({ name: "John" })
- *
- * // Pretty print with indentation
- * const pretty = tryStringify(data, "{}", { space: 2 })
- *
- * // With custom replacer
- * tryStringify(data, "{}", {
- *   replacer: (key, value) => typeof value === 'function' ? undefined : value
- * })
- *
- * // With error handling
- * tryStringify(circularRef, "{}", {
- *   onError: (error) => console.log('Stringify failed:', error)
- * })
- * ```
- */
-export function tryStringify(
-  value: any,
-  fallback: string = '{}',
-  options: StringifyOptions = {}
-): string {
-  const { replacer, space, onError } = options
-
-  try {
-    return JSON.stringify(value, replacer, space)
-  } catch (error) {
-    if (onError) {
-      onError(error as Error, value)
-    }
-    return fallback
-  }
-}
-
-/**
- * Coerces string values to their appropriate types
- * Handles nested objects and arrays when deep option is enabled
- *
- * @template T - The expected type of the result
- * @param data - The data to coerce (object, array, or primitive)
- * @param options - Coercion options for customizing the conversion behavior
- * @returns The coerced data with converted values
- *
- * @example
- * ```typescript
- * // Basic boolean and null conversion
- * coerceValues({ active: "true", value: "null" })
- * // Returns: { active: true, value: null }
- *
- * // With number parsing
- * coerceValues({ count: "42", price: "3.14" }, { parseNumbers: true })
- * // Returns: { count: 42, price: 3.14 }
- *
- * // Deep coercion
- * coerceValues({ user: { active: "false", age: "25" } }, {
- *   deep: true,
- *   parseNumbers: true
- * })
- * // Returns: { user: { active: false, age: 25 } }
- *
- * // With date parsing
- * coerceValues({ createdAt: "2024-01-01" }, { parseDates: true })
- * // Returns: { createdAt: Date(2024-01-01) }
- *
- * // With custom transformer
- * coerceValues({ status: "ACTIVE" }, {
- *   transformer: (val) => typeof val === 'string' ? val.toLowerCase() : val
- * })
- * // Returns: { status: "active" }
- *
- * // Specific keys only
- * coerceValues({
- *   active: "true",
- *   name: "true"
- * }, { keys: ["active"] })
- * // Returns: { active: true, name: "true" }
- *
- * // Chain with tryParse for JSON strings in data
- * const data = { config: '{"theme":"dark"}' }
- * const parsed = coerceValues(data, {
- *   transformer: (val, key) => {
- *     if (key === 'config' && typeof val === 'string') {
- *       return tryParse(val, val)
- *     }
- *     return val
- *   }
- * })
- * ```
- */
-export function coerceValues<T = any>(data: T, options: CoerceOptions = {}): T {
-  const {
-    deep = false,
-    transformer,
-    parseNumbers = false,
-    parseDates = false,
-    keys,
-    emptyStringToNull = false,
-    parseSpecialNumbers = false
-  } = options
-
-  // Handle null and undefined
-  if (data === null || data === undefined) {
-    return data
-  }
-
-  // Handle primitive types
-  if (typeof data !== 'object') {
-    return data
-  }
-
-  // Handle arrays
-  if (Array.isArray(data)) {
-    if (!deep) return data
-    return data.map((item) => coerceValues(item, options)) as T
-  }
-
-  // Simple value map for common string representations
-  const simpleMap: Record<string, any> = {
-    true: true,
-    false: false,
-    null: null,
-    undefined
-  }
-
-  // Special numeric values
-  if (parseSpecialNumbers) {
-    simpleMap.NaN = Number.NaN
-    simpleMap.Infinity = Infinity
-    simpleMap['-Infinity'] = -Infinity
-  }
-
-  /**
-   * ISO 8601 date regex pattern
-   * Matches: YYYY-MM-DD, YYYY-MM-DDTHH:mm:ss, YYYY-MM-DDTHH:mm:ss.sssZ
-   */
-  const ISO_DATE_PATTERN =
-    /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?)?$/
-
-  /**
-   * Numeric string pattern (including negative and decimal)
-   */
-  const NUMERIC_PATTERN = /^-?\d+(\.\d+)?$/
-
-  /**
-   * Coerces a single value to its appropriate type
-   */
-  const coerceValue = (val: any, key: string): any => {
-    // Apply custom transformer first if provided
-    if (transformer) {
-      const transformed = transformer(val, key)
-      if (transformed !== val) return transformed
-    }
-
-    // Handle string values
-    if (typeof val === 'string') {
-      // Handle empty strings
-      if (emptyStringToNull && val === '') {
-        return null
-      }
-
-      // Check simple value map (true, false, null, undefined, etc.)
-      if (val in simpleMap) {
-        return simpleMap[val]
-      }
-
-      // Parse dates if enabled
-      if (parseDates && ISO_DATE_PATTERN.test(val)) {
-        const date = new Date(val)
-        if (!Number.isNaN(date.getTime())) {
-          return date
-        }
-      }
-
-      // Parse numbers if enabled
-      if (parseNumbers && NUMERIC_PATTERN.test(val)) {
-        const num = Number(val)
-        if (!Number.isNaN(num)) return num
-      }
-
-      return val
-    }
-
-    // Recursively handle nested objects/arrays in deep mode
-    if (deep && val !== null && typeof val === 'object') {
-      return coerceValues(val, options)
-    }
-
-    return val
-  }
-
-  // Process object entries efficiently
-  const result: Record<string, any> = {}
-
-  for (const [key, value] of Object.entries(data as Record<string, any>)) {
-    // Skip keys not in the allowed list if keys option is provided
-    if (keys && !keys.includes(key)) {
-      result[key] = value
-      continue
-    }
-
-    result[key] = coerceValue(value, key)
-  }
-
-  return result as T
-}
-
-/**
- * Creates a custom value transformer with predefined rules
- *
- * @param rules - Map of key patterns to transformation functions
- * @returns A transformer function that can be used with coerceValues
- *
- * @example
- * ```typescript
- * // Basic transformer
- * const transformer = createTransformer({
- *   'date': (val) => val.match(/^\d{4}-\d{2}-\d{2}$/) ? new Date(val) : val,
- *   'price': (val) => typeof val === 'string' ? parseFloat(val) : val
- * })
- *
- * // Wildcard transformer (applies to all keys)
- * const trimTransformer = createTransformer({
- *   '*': (val) => typeof val === 'string' ? val.trim() : val
- * })
- *
- * // Use with coerceValues
- * coerceValues(data, { transformer })
- * ```
- */
-export function createTransformer(
-  rules: Record<string, (value: any) => any>
-): ValueTransformer {
-  return (value: any, key: string) => {
-    // Check specific key patterns first
-    for (const [pattern, transform] of Object.entries(rules)) {
-      if (pattern === '*') continue // Skip wildcard for now
-
-      if (key.includes(pattern)) {
-        const transformed = transform(value)
-        if (transformed !== value) return transformed
-      }
-    }
-
-    // Apply wildcard rule if exists
-    if (rules['*']) {
-      return rules['*'](value)
-    }
-
-    return value
   }
 }
