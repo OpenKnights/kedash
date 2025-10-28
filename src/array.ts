@@ -30,7 +30,7 @@ export const group = <T, Key extends string | number | symbol>(
  *
  * @template T - The type of items in the array
  * @param {readonly T[]} array - The array to sort
- * @param {SortType} [type='ASC'] - Sort direction, either 'ASC' for ascending or 'DESC' for descending
+ * @param {SortType} [type] - Sort direction, either 'ASC' for ascending or 'DESC' for descending
  * @param {(item: T) => number} [getter] - Function to extract the numeric value to sort by. Defaults to treating items as numbers
  *
  */
@@ -51,7 +51,7 @@ export const sort = <T>(
  *
  * @template T - The type of items in the array
  * @param {T[]} array - The array to sort
- * @param {SortType} [type='ASC'] - Sort direction, either 'ASC' for ascending or 'DESC' for descending
+ * @param {SortType} [type] - Sort direction, either 'ASC' for ascending or 'DESC' for descending
  * @param {(item: T) => number} [getter] - Function to extract the numeric value to sort by. Defaults to treating items as numbers
  *
  */

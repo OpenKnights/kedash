@@ -152,7 +152,7 @@ export function formatDate(
  *   - A date string (e.g., '2024-03-15', '2024-03-15T10:30:00')
  *   - A numeric timestamp (milliseconds since Unix epoch)
  *   - A Date object
- * @param {string | null} [format='yyyy-MM-dd HH:mm:ss'] - The format template string. Available patterns:
+ * @param {string | null} [format] - The format template string. Available patterns:
  *   - 'yyyy': Four-digit year
  *   - 'MM': Two-digit month (01-12)
  *   - 'dd': Two-digit day (01-31)
@@ -162,7 +162,7 @@ export function formatDate(
  *   - 'WK': Week day name (depends on weekNames option)
  *   Pass null, undefined, or empty string to return the DateFormatValues object instead
  * @param {FormatDateOptions} [options] - Optional configuration object
- * @param {('zh' | 'en' | WeekNamesRecord)} [options.weekNames='zh'] - Week names localization:
+ * @param {('zh' | 'en' | WeekNamesRecord)} [options.weekNames] - Week names localization:
  *   - 'zh': Chinese week names (日, 一, 二, 三, 四, 五, 六)
  *   - 'en': English week names (Sunday, Monday, etc.)
  *   - Custom object mapping 0-6 to custom week names

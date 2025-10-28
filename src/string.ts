@@ -33,8 +33,8 @@ export function insertAt(
  * Powerful utility for converting between different case conventions (camelCase, PascalCase, snake_case, etc.).
  *
  * @param {string} source - The source string to transform
- * @param {[string, string]} [separators=[' ', '']] - A tuple of [inputSeparator, outputSeparator].
- * @param {CaseTypeTuple} [caseRules=['upper', 'lower']] - A tuple of [firstWordCase, otherWordsCase].
+ * @param {[string, string]} [separators] - A tuple of [inputSeparator, outputSeparator].
+ * @param {CaseTypeTuple} [caseRules] - A tuple of [firstWordCase, otherWordsCase].
  *
  */
 export function transformCase(

@@ -54,8 +54,8 @@ export function compose(...fns: ((...args: any[]) => any)[]) {
  *
  * @template T - The type of the callback function
  * @param {T} callback - The function to debounce
- * @param {number} [delay=0] - The number of milliseconds to delay
- * @param {boolean} [immediate=false] - If true, invoke the callback on the leading edge instead of the trailing edge
+ * @param {number} [delay] - The number of milliseconds to delay
+ * @param {boolean} [immediate] - If true, invoke the callback on the leading edge instead of the trailing edge
  *
  */
 export function debounce<T extends (...args: any[]) => any>(
@@ -113,7 +113,7 @@ export function debounce<T extends (...args: any[]) => any>(
  * @template T - The type of the callback function
  * @param {T} callback - The function to throttle
  * @param {number} interval - The number of milliseconds to throttle invocations to
- * @param {ThrottleOptions} [options={}] - ThrottleOptions object
+ * @param {ThrottleOptions} [options] - ThrottleOptions object
  *
  */
 export function throttle<T extends (...args: any[]) => any>(
