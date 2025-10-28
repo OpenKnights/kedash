@@ -1,6 +1,6 @@
 {
   "name": "kedash",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Functional utility library - modern, simple, typed, powerful",
   "type": "module",
   "keywords": [
