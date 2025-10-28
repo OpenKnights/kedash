@@ -283,7 +283,7 @@ composed(10)
 // 结果: ((10 + 5) * 2) - 3 = 27
 
 const toUpperCase = (str: string) => str.toUpperCase()
-const addExclamation = (str: string) => `${str  }!`
+const addExclamation = (str: string) => `${str}!`
 const greet = (name: string) => `Hello, ${name}`
 
 const pipeline = compose(greet, toUpperCase, addExclamation)
