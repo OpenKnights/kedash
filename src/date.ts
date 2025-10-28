@@ -7,7 +7,9 @@ import type {
 import { padNumber } from './number'
 import { isObject, isString } from './typed'
 
-// Formatting rule mapping
+/**
+ * Formatting rule mapping that maps format patterns to date value keys
+ */
 const FORMAT_PATTERNS = new Map<string, keyof DateFormatValues>([
   ['yyyy', 'year'],
   ['MM', 'month'],
@@ -18,7 +20,12 @@ const FORMAT_PATTERNS = new Map<string, keyof DateFormatValues>([
   ['WK', 'week']
 ])
 
-// Weekly Map
+/**
+ * Converts a week names record object to a Map for efficient lookups
+ *
+ * @param {WeekNamesRecord} names - An object mapping week day numbers (0-6) to their names
+ *
+ */
 function toWeekMap(names: WeekNamesRecord): Map<WeekDay, string> {
   return new Map(
     (Object.entries(names) as [string, string][]).map(([k, v]) => [
@@ -28,6 +35,9 @@ function toWeekMap(names: WeekNamesRecord): Map<WeekDay, string> {
   )
 }
 
+/**
+ * Chinese week names mapping (0 = '日' to 6 = '六')
+ */
 const WEEK_NAMES_ZH = toWeekMap({
   0: '日',
   1: '一',
@@ -38,6 +48,9 @@ const WEEK_NAMES_ZH = toWeekMap({
   6: '六'
 })
 
+/**
+ * English week names mapping (0 = 'Sunday' to 6 = 'Saturday')
+ */
 const WEEK_NAMES_EN = toWeekMap({
   0: 'Sunday',
   1: 'Monday',
@@ -48,6 +61,12 @@ const WEEK_NAMES_EN = toWeekMap({
   6: 'Saturday'
 })
 
+/**
+ * Returns the appropriate week names map based on the provided option
+ *
+ * @param {FormatDateOptions['weekNames']} wk - The week names option ('zh', 'en', or a custom WeekNamesRecord)
+ *
+ */
 function returnWeekNames(
   wk: FormatDateOptions['weekNames']
 ): Map<WeekDay, string> {
@@ -59,7 +78,11 @@ function returnWeekNames(
 }
 
 /**
- * Create a date format value object
+ * Creates a date format values object containing all date components
+ *
+ * @param {Date} date - The Date object to extract values from
+ * @param {Map<WeekDay, string>} weekNames - The week names map to use for the week value
+ *
  */
 function createDateValues(
   date: Date,
@@ -79,18 +102,42 @@ function createDateValues(
   }
 }
 
+/**
+ * Formats a date according to the specified format string and returns a formatted string
+ *
+ * @param {string | number | Date} date - The date to format (string, timestamp, or Date object)
+ * @param {string} format - The format template string
+ * @param {FormatDateOptions} [options] - Optional configuration for formatting
+ * @returns {string} The formatted date string
+ */
 export function formatDate(
   date: string | number | Date,
   format: string,
   options?: FormatDateOptions
 ): string
 
+/**
+ * Returns the raw date values object when format is null or undefined
+ *
+ * @param {string | number | Date} date - The date to format (string, timestamp, or Date object)
+ * @param {null | undefined} format - Pass null or undefined to return the values object
+ * @param {FormatDateOptions} [options] - Optional configuration for formatting
+ * @returns {DateFormatValues} An object containing all date component values
+ */
 export function formatDate(
   date: string | number | Date,
   format: null | undefined,
   options?: FormatDateOptions
 ): DateFormatValues
 
+/**
+ * Formats a date with optional format string (defaults to 'yyyy-MM-dd HH:mm:ss')
+ *
+ * @param {string | number | Date} date - The date to format (string, timestamp, or Date object)
+ * @param {string} [format] - The format template string (optional)
+ * @param {FormatDateOptions} [options] - Optional configuration for formatting
+ * @returns {string} The formatted date string
+ */
 export function formatDate(
   date: string | number | Date,
   format?: string,
@@ -98,11 +145,31 @@ export function formatDate(
 ): string
 
 /**
- * Formatting Dates
- * @param date - The date to be formatted (can be a string, a numeric timestamp, or a Date object)
- * @param format - The formatting template, default is 'yyyy-MM-dd HH:mm:ss'
- *                 Passing an empty string returns the formatted value object
- * @returns Formatted string or formatted value object
+ * Formats a date according to a specified format template or returns date component values.
+ * Supports custom week names in Chinese, English, or custom formats.
+ *
+ * @param {string | number | Date} date - The date to format. Can be:
+ *   - A date string (e.g., '2024-03-15', '2024-03-15T10:30:00')
+ *   - A numeric timestamp (milliseconds since Unix epoch)
+ *   - A Date object
+ * @param {string | null} [format='yyyy-MM-dd HH:mm:ss'] - The format template string. Available patterns:
+ *   - 'yyyy': Four-digit year
+ *   - 'MM': Two-digit month (01-12)
+ *   - 'dd': Two-digit day (01-31)
+ *   - 'HH': Two-digit hours (00-23)
+ *   - 'mm': Two-digit minutes (00-59)
+ *   - 'ss': Two-digit seconds (00-59)
+ *   - 'WK': Week day name (depends on weekNames option)
+ *   Pass null, undefined, or empty string to return the DateFormatValues object instead
+ * @param {FormatDateOptions} [options] - Optional configuration object
+ * @param {('zh' | 'en' | WeekNamesRecord)} [options.weekNames='zh'] - Week names localization:
+ *   - 'zh': Chinese week names (日, 一, 二, 三, 四, 五, 六)
+ *   - 'en': English week names (Sunday, Monday, etc.)
+ *   - Custom object mapping 0-6 to custom week names
+ * @returns {string | DateFormatValues} Either:
+ *   - A formatted date string (when format is provided)
+ *   - A DateFormatValues object with individual date components (when format is null/undefined/empty)
+ *
  */
 export function formatDate(
   date: string | number | Date,

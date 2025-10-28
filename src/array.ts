@@ -1,9 +1,13 @@
 import type { SortType } from './types'
 
 /**
- * Sorts an array of items into groups. The return value is a map where the keys are
- * the group ids the given getGroupId function produced and the value is an array of
- * each item in that group.
+ * Sorts an array of items into groups.
+ *
+ * @template T - The type of items in the array
+ * @template Key - The type of the group key (must be string, number, or symbol)
+ * @param {readonly T[]} array - The array of items to group
+ * @param {(item: T) => Key} getGroupId - Function that returns the group key for each item
+ *
  */
 export const group = <T, Key extends string | number | symbol>(
   array: readonly T[],
@@ -23,6 +27,12 @@ export const group = <T, Key extends string | number | symbol>(
 /**
  * Sort an array without modifying it and return
  * the newly sorted value
+ *
+ * @template T - The type of items in the array
+ * @param {readonly T[]} array - The array to sort
+ * @param {SortType} [type='ASC'] - Sort direction, either 'ASC' for ascending or 'DESC' for descending
+ * @param {(item: T) => number} [getter] - Function to extract the numeric value to sort by. Defaults to treating items as numbers
+ *
  */
 export const sort = <T>(
   array: readonly T[],
@@ -35,6 +45,16 @@ export const sort = <T>(
   return array.slice().sort(type === 'DESC' ? dsc : asc)
 }
 
+/**
+ * Sorts an array using the bubble sort algorithm without modifying the original array.
+ * Returns a new sorted array. Uses an optimized version that stops early if no swaps occur.
+ *
+ * @template T - The type of items in the array
+ * @param {T[]} array - The array to sort
+ * @param {SortType} [type='ASC'] - Sort direction, either 'ASC' for ascending or 'DESC' for descending
+ * @param {(item: T) => number} [getter] - Function to extract the numeric value to sort by. Defaults to treating items as numbers
+ *
+ */
 export function bubblingSort<T>(
   array: T[],
   type: SortType = 'ASC',
@@ -76,6 +96,12 @@ export function bubblingSort<T>(
  * NOTE: This is NOT zero indexed. If you pass count=5
  * you will get 1, 2, 3, 4, 5 iteration in the callback
  * function
+ *
+ * @template T - The type of the accumulated value
+ * @param {number} count - The number of iterations to perform (1-indexed)
+ * @param {(currentValue: T, iteration: number) => T} func - Function called on each iteration with the current value and iteration number (starting from 1)
+ * @param {T} initValue - The initial value to start with
+ *
  */
 export const iterate = <T>(
   count: number,

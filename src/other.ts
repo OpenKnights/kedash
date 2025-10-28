@@ -13,24 +13,10 @@ import { iterate } from './array'
 /**
  * Creates a serial interval executor
  *
- * Difference from setInterval:
- * - setInterval: Triggers every X milliseconds (regardless of whether the previous execution is complete)
- * - setSerialInterval: Waits for the previous execution to complete, then waits X milliseconds before executing the next one
- *
  * @param execute - The function to execute on each interval
  * @param delay - Delay in milliseconds between executions (default: 0)
  * @param immediate - Whether to execute immediately before the first delay (default: false)
- * @returns A TimerControl object with a cancel method
  *
- * @example
- * ```typescript
- * const timer = setSerialInterval(async () => {
- *   await fetchData()
- * }, 5000)
- *
- * // Cancel when needed
- * timer.cancel()
- * ```
  */
 export function setSerialInterval(
   execute: (...args: any[]) => any,
@@ -83,13 +69,7 @@ export function setSerialInterval(
  *
  * @param min - The minimum value (inclusive)
  * @param max - The maximum value (inclusive)
- * @returns A random integer between min and max
  *
- * @example
- * ```typescript
- * random(1, 10) // Returns a number between 1 and 10
- * random(0, 100) // Returns a number between 0 and 100
- * ```
  */
 export const random = (min: number, max: number): number => {
   return Math.floor(Math.random() * (max - min + 1) + min)
@@ -100,13 +80,7 @@ export const random = (min: number, max: number): number => {
  *
  * @param length - The length of the generated ID
  * @param specials - Optional special characters to include in the character set (default: '')
- * @returns A randomly generated string ID
  *
- * @example
- * ```typescript
- * uid(10) // Returns: "aBc123XyZ4"
- * uid(8, '!@#') // Returns: "aB3!@cD#"
- * ```
  */
 export const uid = (length: number, specials: string = ''): string => {
   const characters = `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789${specials}`
@@ -124,27 +98,8 @@ export const uid = (length: number, specials: string = ''): string => {
 /**
  * Transforms an object into URL query string parameters
  *
- * Supports nested objects with bracket notation (e.g., filter[name]=value)
- * Automatically encodes keys and values for URL safety
- * Skips null, undefined, and empty string values
- *
  * @param params - The parameters object to transform
- * @returns URL-encoded query string (without leading '?')
  *
- * @example
- * ```typescript
- * // Simple parameters
- * toQueryString({ name: 'John', age: 25 })
- * // Returns: 'name=John&age=25'
- *
- * // Nested object parameters
- * toQueryString({ filter: { status: 'active', type: 'user' }, page: 1 })
- * // Returns: 'filter[status]=active&filter[type]=user&page=1'
- *
- * // Skips empty values
- * toQueryString({ name: 'John', email: null, phone: '' })
- * // Returns: 'name=John'
- * ```
  */
 export function toQueryString(params: Recordable): string {
   const pairs: string[] = []
@@ -179,32 +134,7 @@ export function toQueryString(params: Recordable): string {
  *
  * @param keys - Array of parameter keys to retrieve
  * @param options - Configuration options
- * @returns Object containing the requested parameters
  *
- * @example
- * ```typescript
- * // Get from current URL
- * getQueryParams(['page', 'filter'])
- * // Returns: { page: '2', filter: 'active' }
- *
- * // Get from custom URL
- * getQueryParams(
- *   ['id'],
- *   { url: 'https://example.com?id=123&type=post' }
- * )
- * // Returns: { id: '123' }
- *
- * // Get all query params
- * getQueryParams(
- *   [],
- *   { url: 'https://example.com?id=123&type=post', all: true }
- * )
- * // Returns: { id: '123', type: 'post' }
- *
- * // URL without params (automatically adds ?)
- * getQueryParams(['id'], { url: 'https://example.com' })
- * // Returns: { id: undefined }
- * ```
  */
 export function getQueryParams(
   keys: string[],
@@ -262,37 +192,7 @@ export function getQueryParams(
  *
  * @param params - Object containing parameters to set or update
  * @param options - Configuration options
- * @returns The modified URL string (if custom URL provided), or void (if modifying window.location)
  *
- * @example
- * ```typescript
- * // Modify current URL
- * setQueryParams({ page: 2, filter: 'active' })
- * // Current URL becomes: ?page=2&filter=active
- *
- * // Return modified custom URL
- * const newUrl = setQueryParams(
- *   { page: 2, filter: 'active' },
- *   { url: 'https://example.com/path' }
- * )
- * // Returns: 'https://example.com/path?page=2&filter=active'
- *
- * // URL with existing params
- * const newUrl = setQueryParams(
- *   { page: 3 },
- *   { url: 'https://example.com?page=1&filter=all' }
- * )
- * // Returns: 'https://example.com?page=3&filter=all'
- *
- * // Custom skip logic
- * setQueryParams(
- *   { tags: [], status: null },
- *   {
- *     skipNull: false,
- *     skipIf: (key, value) => Array.isArray(value) && value.length === 0
- *   }
- * )
- * ```
  */
 export function setQueryParams(
   params: Recordable,
@@ -383,27 +283,10 @@ export function setQueryParams(
 /**
  * Attempts to parse a JSON string with fallback value
  *
- * @template T - The expected type of the parsed result
  * @param str - The JSON string to parse
  * @param fallback - The fallback value if parsing fails (default: null)
  * @param options - Parsing options including validator and error callback
- * @returns The parsed result, or fallback value
  *
- * @example
- * ```typescript
- * // Basic usage
- * const data = tryParse<User>('{"name":"John"}', {})
- *
- * // With validation
- * const withValidation = tryParse('{"id":1}', null, {
- *   validator: (val): val is User => typeof val.id === 'number'
- * })
- *
- * // With error handling
- * tryParse('invalid json', {}, {
- *   onError: (error, input) => console.log('Parse failed:', error)
- * })
- * ```
  */
 export function tryParse<T = any>(
   str: string,

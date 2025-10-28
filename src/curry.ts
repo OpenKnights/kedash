@@ -1,3 +1,13 @@
+import type { ThrottleOptions } from './types'
+
+/**
+ * Converts a function into a curried function that can be called with partial arguments.
+ * A curried function can be called multiple times with fewer arguments than required,
+ * and will return a new function until all arguments are provided.
+ *
+ * @param {(...args: any[]) => any} fn - The function to curry
+ *
+ */
 export function currying(fn: (...args: any[]) => any) {
   function curried(this: any, ...args: any[]) {
     if (args.length >= fn.length) return fn.apply(this, args)
@@ -9,6 +19,13 @@ export function currying(fn: (...args: any[]) => any) {
   return curried
 }
 
+/**
+ * Composes multiple functions into a single function that executes them from left to right.
+ * Each function receives the result of the previous function as its argument.
+ *
+ * @param {...((...args: any[]) => any)[]} fns - Functions to compose
+ *
+ */
 export function compose(...fns: ((...args: any[]) => any)[]) {
   const { length } = fns
   if (length <= 0) return null
@@ -30,6 +47,17 @@ export function compose(...fns: ((...args: any[]) => any)[]) {
   return executeFn
 }
 
+/**
+ * Creates a debounced function that delays invoking the callback until after the specified
+ * delay has elapsed since the last time the debounced function was invoked.
+ * Returns a Promise that resolves with the callback's return value.
+ *
+ * @template T - The type of the callback function
+ * @param {T} callback - The function to debounce
+ * @param {number} [delay=0] - The number of milliseconds to delay
+ * @param {boolean} [immediate=false] - If true, invoke the callback on the leading edge instead of the trailing edge
+ *
+ */
 export function debounce<T extends (...args: any[]) => any>(
   callback: T,
   delay: number = 0,
@@ -78,11 +106,16 @@ export function debounce<T extends (...args: any[]) => any>(
   return subDebounce
 }
 
-interface ThrottleOptions {
-  leading?: boolean
-  trailing?: boolean
-}
-
+/**
+ * Creates a throttled function that only invokes the callback at most once per specified interval.
+ * Returns a Promise that resolves with the callback's return value.
+ *
+ * @template T - The type of the callback function
+ * @param {T} callback - The function to throttle
+ * @param {number} interval - The number of milliseconds to throttle invocations to
+ * @param {ThrottleOptions} [options={}] - ThrottleOptions object
+ *
+ */
 export function throttle<T extends (...args: any[]) => any>(
   callback: T,
   interval: number,

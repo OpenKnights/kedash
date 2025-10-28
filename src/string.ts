@@ -2,7 +2,13 @@ import type { CaseTypeTuple } from './types'
 import { isString } from './typed'
 
 /**
- * Inserts a string at a specified position in the source string
+ * Inserts a string at a specified position in the source string.
+ * Supports negative indices (counting from the end) similar to Array.slice().
+ *
+ * @param {string} source - The original string
+ * @param {number} position - The position where the text should be inserted.
+ * @param {string} text - The text to insert
+ *
  */
 export function insertAt(
   source: string,
@@ -23,7 +29,13 @@ export function insertAt(
 }
 
 /**
- * Transforms string case with custom separators and capitalization rules
+ * Transforms string case with custom separators and capitalization rules.
+ * Powerful utility for converting between different case conventions (camelCase, PascalCase, snake_case, etc.).
+ *
+ * @param {string} source - The source string to transform
+ * @param {[string, string]} [separators=[' ', '']] - A tuple of [inputSeparator, outputSeparator].
+ * @param {CaseTypeTuple} [caseRules=['upper', 'lower']] - A tuple of [firstWordCase, otherWordsCase].
+ *
  */
 export function transformCase(
   source: string,

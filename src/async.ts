@@ -1,7 +1,11 @@
 import { isPromise } from './typed'
 
 /**
- * Async wait
+ * Creates a promise that resolves after a specified number of milliseconds.
+ * Useful for creating delays in async functions or rate limiting operations.
+ *
+ * @param {number} milliseconds - The number of milliseconds to wait before resolving
+ *
  */
 export const sleep = (milliseconds: number) => {
   return new Promise((res) => setTimeout(res, milliseconds))
@@ -11,6 +15,7 @@ export const sleep = (milliseconds: number) => {
  * A helper to try an async function without forking
  * the control flow. Returns an error first callback _like_
  * array response as [Error, result]
+ *
  */
 export const tryit = <Args extends any[], Return>(
   func: (...args: Args) => Return

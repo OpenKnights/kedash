@@ -6,6 +6,13 @@ export type Recordable<T = any> = Record<string, T>
 
 export type SortType = 'ASC' | 'DESC'
 
+// ==================== curry ====================
+
+export interface ThrottleOptions {
+  leading?: boolean
+  trailing?: boolean
+}
+
 // ==================== object ====================
 
 /**

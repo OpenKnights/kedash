@@ -114,14 +114,12 @@ export const isEqual = <TType>(x: TType, y: TType): boolean => {
 }
 
 /**
- * Get the exact type name of a variable
- * @param target - value to check
- * @example
- * // Default use
- * getType('hello') // Returns CommonType
+ * Gets the exact type name of a variable as a lowercase string.
+ * More reliable than typeof for distinguishing between object types.
  *
- * // Extend a custom type
- * getType<'set' | 'map'>(value) // Returns CommonType | 'set' | 'map'
+ * @template T - Additional custom type names to include in the return type
+ * @param {unknown} target - The value to check
+ *
  */
 export const getType = <T extends string = never>(
   target: unknown
@@ -132,9 +130,13 @@ export const getType = <T extends string = never>(
 }
 
 /**
- * Checks if the target is of a specified type
- * @param type - expected type name
- * @param target - value to check
+ * Checks if a target value is of a specified type name.
+ * Combines getType with equality check for convenient type validation.
+ *
+ * @template T - Additional custom type names to check
+ * @param {CommonType | T} type - The expected type name (lowercase)
+ * @param {unknown} target - The value to check
+ *
  */
 export const isType = <T extends string = never>(
   type: CommonType | T,
