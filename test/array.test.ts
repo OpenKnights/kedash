@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import { bubblingSort, group, iterate, sort } from '../src/array'
 
 describe('array utilities', () => {

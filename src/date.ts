@@ -4,6 +4,7 @@ import type {
   WeekDay,
   WeekNamesRecord
 } from './types'
+
 import { padNumber } from './number'
 import { isObject, isString } from './typed'
 

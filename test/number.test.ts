@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import { padNumber, toFloat, toInt } from '../src/number'
 
 describe('number utilities', () => {

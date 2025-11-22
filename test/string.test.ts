@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import { insertAt, transformCase } from '../src/string'
 
 describe('string utilities', () => {

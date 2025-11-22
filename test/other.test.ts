@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { random, setSerialInterval, toQueryString, uid } from '../src/other'
 
 describe('other utilities', () => {

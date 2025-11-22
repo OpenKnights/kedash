@@ -1,4 +1,5 @@
 import type { CaseTypeTuple } from './types'
+
 import { isString } from './typed'
 
 /**

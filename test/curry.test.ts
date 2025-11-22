@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { compose, currying, debounce, throttle } from '../src/curry'
 
 describe('curry utilities', () => {

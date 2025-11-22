@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import { deepClone, shallowClone } from '../src/object'
 
 describe('object utilities', () => {
