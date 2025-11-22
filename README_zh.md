@@ -17,17 +17,13 @@
 - 🛡️ **可靠** - 经过充分测试的工具函数
 - 📦 **模块化** - 按需导入
 
-## 📦 安装
+## 📦 Installation
 
 ```bash
 npm install kedash
-```
-
-```bash
+# or
 pnpm add kedash
-```
-
-```bash
+# or
 yarn add kedash
 ```
 
@@ -1016,18 +1012,12 @@ tryParse(
 )
 ```
 
----
+## 📄 许可证
+
+[MIT](./LICENSE) 许可证 © 2025-至今 [king3](https://github.com/coderking3)
 
 ## 🤝 贡献
 
-欢迎贡献！请随时提交 Pull Request。
+欢迎贡献、问题和功能请求!
 
-## 📄 许可证
-
-[MIT License](LICENSE) © OpenKnights Contributors
-
-## 🔗 链接
-
-- [GitHub 仓库](https://github.com/coderking3/kedash)
-- [NPM 包](https://www.npmjs.com/package/kedash)
-- [问题反馈](https://github.com/coderking3/kedash/issues)
+请随时查看 [issues 页面](https://github.com/OpenKnights/kedash/issues)。

@@ -21,13 +21,9 @@
 
 ```bash
 npm install kedash
-```
-
-```bash
+# or
 pnpm add kedash
-```
-
-```bash
+# or
 yarn add kedash
 ```
 
@@ -1016,18 +1012,12 @@ tryParse(
 )
 ```
 
----
+## 📄 License
+
+[MIT](./LICENSE) License © 2025-PRESENT [king3](https://github.com/coderking3)
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions, issues and feature requests are welcome!
 
-## 📄 License
-
-[MIT License](LICENSE) © OpenKnights Contributors
-
-## 🔗 Links
-
-- [GitHub Repository](https://github.com/coderking3/kedash)
-- [NPM Package](https://www.npmjs.com/package/kedash)
-- [Issues](https://github.com/coderking3/kedash/issues)
+Feel free to check the [issues page](https://github.com/OpenKnights/kedash/issues).
